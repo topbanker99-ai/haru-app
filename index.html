@@ -404,6 +404,36 @@ p{margin:0}
     padding:8px max(14px, env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom, 0px));
     background:var(--card); border-top:1px solid var(--line)}
 }
+/* ── 로그인 · 회원가입 ── */
+.wrapper[data-auth="1"] .appbar, .wrapper[data-auth="1"] .tabs{display:none}
+.hero{display:flex; flex-direction:column; align-items:center; text-align:center; padding:6px 6px 2px}
+.hero img{width:100px; height:100px; object-fit:contain}
+.hero h1{font-size:25px; font-weight:900; letter-spacing:-.045em; margin:4px 0 0; color:var(--ink)}
+.hero p{font-size:12.5px; color:var(--mut); margin:5px 0 0; line-height:1.55}
+.rolepick{display:flex; background:var(--sub-card); border-radius:14px; padding:4px; gap:4px}
+.rolepick button{flex:1; padding:10px 6px; border-radius:11px; font-size:13px; font-weight:800; color:var(--mut)}
+.rolepick button.on{background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(25,31,40,.10)}
+.fld{display:flex; flex-direction:column; gap:5px}
+.fld>label{font-size:11.5px; font-weight:700; color:var(--ink2); padding-left:2px}
+.inp{display:flex; align-items:center; gap:8px; background:var(--sub-card); border:1px solid var(--line); border-radius:12px; padding:0 6px 0 12px; min-height:44px}
+.inp input{flex:1; min-width:0; border:0; outline:0; background:none; font:inherit; font-size:14px; color:var(--ink); padding:11px 0}
+.inp input::placeholder{color:var(--mut)}
+.inp .sm{font-size:11.5px; font-weight:800; color:var(--blue); background:var(--blue-bg); border-radius:9px; padding:7px 10px; white-space:nowrap}
+.inp .tm{font-size:11.5px; font-weight:700; color:var(--red); padding-right:8px}
+.or{display:flex; align-items:center; gap:10px; color:var(--mut); font-size:11px; font-weight:600}
+.or::before,.or::after{content:""; flex:1; height:1px; background:var(--line)}
+.lnk{display:flex; justify-content:center; align-items:center; gap:6px; font-size:12.5px; color:var(--mut)}
+.lnk button{color:var(--blue); font-weight:800}
+.lnk button.u{color:var(--mut); font-weight:700; text-decoration:underline; text-underline-offset:3px}
+.steps{display:flex; gap:5px} .steps i{flex:1; height:4px; border-radius:4px; background:var(--line)} .steps i.on{background:var(--blue)}
+.agree .row{font-size:12.5px; padding:8px 0}
+.agree .row b{display:flex; align-items:center; gap:8px; font-weight:600}
+.agree .row:first-of-type b{font-weight:800; color:var(--ink)}
+.agree .row span.v{font-size:11px; color:var(--mut); font-weight:600}
+.ck{width:18px; height:18px; border-radius:6px; background:var(--grn); display:grid; place-items:center; flex:0 0 auto}
+.ck svg{width:12px; height:12px}
+.ck.off{background:var(--sub-card); border:1px solid var(--line)}
+[data-role="youth"] .ck:not(.off){background:var(--blue)}
 </style>
 </head>
 <body>
@@ -443,6 +473,51 @@ var DEFDAY={normal:15, watch:13, caution:9, urgent:0};
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function tick(){var d=new Date();document.getElementById('clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
 tick(); setInterval(tick,20000);
+
+/* ─────────── 로그인 · 회원가입 ─────────── */
+function fLogin(){
+  var fam=(role==='family');
+  return '<div class="hero"><img src="'+(fam?IMG.house:IMG.rider)+'" alt="">'+
+    '<h1>할머니의 하루</h1>'+
+    '<p>'+(fam?'쓰던 휴대폰 하나로<br>어르신의 하루를 가족에게 전합니다':'우리 동네 어르신 곁으로<br>지역 청년이 찾아갑니다')+'</p></div>'+
+  '<div class="rolepick"><button data-srole="family" class="'+(fam?'on':'')+'">가족으로 로그인</button>'+
+    '<button data-srole="youth" class="'+(fam?'':'on')+'">청년으로 로그인</button></div>'+
+  '<div class="fld"><label>휴대폰 번호</label><div class="inp"><input inputmode="tel" autocomplete="tel" placeholder="010-0000-0000"><button class="sm">인증 요청</button></div></div>'+
+  '<div class="fld"><label>인증번호</label><div class="inp"><input inputmode="numeric" autocomplete="one-time-code" placeholder="문자로 받은 6자리"><span class="tm">3:00</span></div></div>'+
+  '<button class="b '+(fam?'grn':'blu')+'" data-enter="1">로그인</button>'+
+  '<div class="or">또는</div>'+
+  '<div class="sso"><button class="kk" data-enter="1">카카오로 시작하기</button><button class="nn" data-enter="1">네이버로 시작하기</button></div>'+
+  '<div class="lnk">처음이신가요?<button data-go="signup">회원가입</button></div>'+
+  '<div class="lnk"><button class="u" data-go="'+(fam?'join':'yjoin')+'">'+(fam?'요금 · 이용 안내 보기':'가입 조건 · 활동 안내 보기')+'</button></div>';
+}
+function fSignup(){
+  var fam=(role==='family');
+  function f(l,ph,extra){return '<div class="fld"><label>'+l+'</label><div class="inp"><input placeholder="'+ph+'">'+(extra||'')+'</div></div>'}
+  var body = fam ?
+    f('이름','이름을 입력하세요')+
+    f('휴대폰 번호','010-0000-0000','<button class="sm">인증</button>')+
+    f('어르신 성함','예) 박순자')+
+    '<div class="fld"><label>어르신과의 관계</label><div class="tags"><button class="on">자녀</button><button>손자녀</button><button>배우자</button><button>기타</button></div></div>'+
+    f('어르신 휴대폰 번호','수집 앱 설치 링크를 문자로 보냅니다')
+   :
+    f('이름','이름을 입력하세요')+
+    f('휴대폰 번호','010-0000-0000','<button class="sm">인증</button>')+
+    f('생년월일','만 19세 이상 가입 가능')+
+    f('활동 지역','예) 충북 괴산군 괴산읍')+
+    '<div class="fld"><label>전공 (선택)</label><div class="tags"><button class="on">간호</button><button>사회복지</button><button>응급구조</button><button>기타</button></div></div>';
+  var ag = fam ? [['서비스 이용약관 (필수)',1],['개인정보 수집 · 이용 (필수)',1],['어르신 본인의 수집 동의 확인 (필수)',1],['소식 · 혜택 알림 (선택)',0]]
+               : [['서비스 이용약관 (필수)',1],['개인정보 수집 · 이용 (필수)',1],['신원 확인 · 경력 조회 동의 (필수)',1],['소식 · 혜택 알림 (선택)',0]];
+  return '<div class="ttlrow"><div><div class="dt">회원가입 · 1/2 기본 정보</div><h2>'+(fam?'가족(보호자)으로 가입':'청년(활동자)으로 가입')+'</h2></div></div>'+
+    '<div class="steps"><i class="on"></i><i></i></div>'+
+    '<div class="rolepick"><button data-srole="family" class="'+(fam?'on':'')+'">가족</button><button data-srole="youth" class="'+(fam?'':'on')+'">청년</button></div>'+
+    body+
+    '<div class="c agree"><div class="row"><b><span class="ck">'+check()+'</span>약관 전체 동의</b></div>'+
+    ag.map(function(a){return '<div class="row"><b><span class="ck'+(a[1]?'':' off')+'">'+(a[1]?check():'')+'</span>'+a[0]+'</b><span class="v">보기</span></div>'}).join('')+'</div>'+
+    '<button class="b '+(fam?'grn':'blu')+'" data-enter="1">가입하고 시작하기</button>'+
+    (fam?'<div class="note">어르신 휴대폰에는 <b>수집 앱만</b> 설치됩니다. 음성 원문은 기기 밖으로 나가지 않습니다.</div>'
+        :'<div class="note">가입 후 <b>본인 확인 → 교육 → 현장평가</b>를 거쳐 활동이 승인됩니다.</div>')+
+    '<div class="lnk">이미 계정이 있으신가요?<button data-go="login">로그인</button></div>';
+}
 
 /* ─────────── 공통 조각 ─────────── */
 function title(dt,h){return '<div class="ttlrow"><div><div class="dt">'+dt+'</div><h2>'+h+'</h2></div></div>'}
@@ -638,14 +713,10 @@ function fSup(){
   '<div class="note">전달되는 것은 <b>성함 · 주소 · 연락처 · 호출 사유</b> 네 가지뿐입니다. 어머니의 대화 기록과 과거 위치는 청년에게 보이지 않습니다.</div>';
 }
 function fJoin(){
-  return title('회원가입 · 로그인','가족용 이용 안내')+
+  return title('요금 · 이용 안내','가족용 이용 안내')+
   '<div class="c flat"><p class="big">1분이면 시작하실 수 있습니다</p>'+
    '<p>어르신 휴대폰에 수집 앱을 한 번 설치하면 됩니다. 새 기기를 사지 않으셔도 됩니다.</p>'+
-   '<div class="sso" style="margin-top:12px">'+
-    '<button class="kk">카카오로 3초 만에 시작하기</button>'+
-    '<button class="nn">네이버로 시작하기</button>'+
-    '<button class="pp2">휴대폰 번호로 가입하기</button></div>'+
-   '<p style="margin-top:10px; font-size:11px; color:var(--mut)">이미 계정이 있으시면 같은 방법으로 로그인됩니다.</p></div>'+
+   '<div class="bb" style="margin-top:12px"><button class="b grn" data-go="signup">회원가입</button><button class="b gho" data-go="login">로그인</button></div></div>'+
   '<div class="ttlrow" style="margin-top:4px"><div><div class="dt">구독료</div><h2>어떻게 고르면 될까요</h2></div></div>'+
   '<div class="plan"><div class="ph"><span class="pn">기본형</span></div>'+
    '<div class="pp num">9,900<span>원 / 월</span></div>'+
@@ -933,16 +1004,12 @@ function yDone(){
   '<button class="b gho" data-go="list">호출 목록으로</button>';
 }
 function yJoin(){
-  return title('회원가입 · 로그인','청년용 이용 안내')+
+  return title('가입 조건 · 활동 안내','청년용 이용 안내')+
   '<div class="c flat" style="display:flex; gap:12px; align-items:center">'+
    '<img src="'+IMG.rider+'" alt="" style="width:56px;height:56px;flex:0 0 auto">'+
    '<div><p class="big" style="font-size:16px; margin-bottom:3px">지역에서 할 수 있는 일입니다</p>'+
    '<p style="font-size:12px">방문 한 건에 2만~4만 5천원. 최저임금 시급의 두 배 안팎입니다.</p></div></div>'+
-  '<div class="c"><div class="sso">'+
-    '<button class="kk">카카오로 3초 만에 시작하기</button>'+
-    '<button class="nn">네이버로 시작하기</button>'+
-    '<button class="pp2">휴대폰 번호로 가입하기</button></div>'+
-   '<p style="margin-top:10px; font-size:11px; color:var(--mut)">이미 계정이 있으시면 같은 방법으로 로그인됩니다.</p></div>'+
+  '<div class="bb"><button class="b blu" data-go="signup">회원가입</button><button class="b gho" data-go="login">로그인</button></div>'+
   '<div class="c"><h5>가입 조건</h5>'+
    '<div class="row"><b>나이</b><span>만 19세 이상</span></div>'+
    '<div class="row"><b>지역</b><span>활동할 시·군 거주</span></div>'+
@@ -1127,12 +1194,12 @@ var ICON={
  cred:'<path d="M12 3 4 6.5v5c0 4.6 3.3 8.6 8 9.5 4.7-.9 8-4.9 8-9.5v-5L12 3Z"/><path d="M9 12.2l2.2 2.3L15.5 10"/>',
  join:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.6-3.7 3.8-6 7.5-6s6.9 2.3 7.5 6"/>'
 };
-var TABS={family:[['home','홈','home'],['sig','신호','sig'],['rec','기록','rec'],['set','설정','set'],['join','로그인','join']],
-          youth:[['list','호출','list'],['prog','진행','prog'],['act','내 활동','act'],['cred','자격','cred'],['yjoin','로그인','join']]};
+var TABS={family:[['home','홈','home'],['sig','신호','sig'],['rec','기록','rec'],['set','설정','set'],['login','로그인','join']],
+          youth:[['list','호출','list'],['prog','진행','prog'],['act','내 활동','act'],['cred','자격','cred'],['login','로그인','join']]};
 var PAGES={home:fHome, sig:fSig, rec:fRec, set:fSet, emg:fEmg, sup:fSup, apply:fApply, sent:fSent, result:fResult, rate:fRate, reg:fReg, yrate:yRate,
            list:yList, detail:yDetail, move:yMove, check:yCheck, done:yDone, prog:yProg, act:yAct, cred:yCred,
-           join:fJoin, yjoin:yJoin};
-var TABOF={emg:'home', sup:'home', apply:'home', sent:'home', result:'home', rate:'home', reg:'home', detail:'list', move:'prog', check:'prog', done:'prog', yrate:'prog'};
+           join:fJoin, yjoin:yJoin, login:fLogin, signup:fSignup};
+var TABOF={join:'login', yjoin:'login', signup:'login', emg:'home', sup:'home', apply:'home', sent:'home', result:'home', rate:'home', reg:'home', detail:'list', move:'prog', check:'prog', done:'prog', yrate:'prog'};
 
 function renderTabs(){
   TB.innerHTML=TABS[role].map(function(t){
@@ -1142,6 +1209,7 @@ function renderTabs(){
 }
 function render(){
   A.dataset.role=role;
+  A.dataset.auth=(tab==='login'||tab==='signup')?'1':'';
   document.getElementById('roleSub').textContent = role==='family' ? '가족용 · 박순자 님' : '청년용 · 괴산읍 2조';
   V.innerHTML='<div class="pg">'+PAGES[tab]()+'</div>';
   V.scrollTop=0; renderTabs();
@@ -1150,9 +1218,11 @@ function go(t){ tab=t; render() }
 function setRole(r){ if(r===role) return; role=r; tab=(r==='family'?'home':'list'); cur=null; checked={}; rateSent=false; yrateSent=false; regSent=false; render() }
 
 document.addEventListener('click', function(e){
-  var t=e.target.closest('[data-role],[data-tab],[data-go],[data-open],[data-state],[data-sheet],[data-cat],[data-call],[data-chk],[data-close],[data-pick],[data-auto],[data-star],[data-rtag],[data-rsend],[data-ya],[data-ysend],[data-regd],[data-regt],[data-regw],[data-regsend],[data-share],[data-copy]');
+  var t=e.target.closest('[data-role],[data-tab],[data-go],[data-open],[data-state],[data-sheet],[data-cat],[data-call],[data-chk],[data-close],[data-pick],[data-auto],[data-star],[data-rtag],[data-rsend],[data-ya],[data-ysend],[data-regd],[data-regt],[data-regw],[data-regsend],[data-share],[data-copy],[data-srole],[data-enter]');
   if(!t) return;
   if(t.dataset.role) return setRole(t.dataset.role);
+  if(t.dataset.srole){ role=t.dataset.srole; return render() }
+  if(t.dataset.enter){ tab=(role==='family'?'home':'list'); return render() }
   if(t.dataset.tab) return go(t.dataset.tab);
   if(t.dataset.state){ state=t.dataset.state; selDay = t.dataset.day ? +t.dataset.day : (DEFDAY[state]||0); return render() }
   if(t.dataset.open){ cur=t.dataset.open; checked={}; yans={}; yrateSent=false; return go('detail') }
